@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 public class Captcha {
 
   private String token;
+  private String formatName;
   private BufferedImage background;
   private BufferedImage front;
 }

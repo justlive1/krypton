@@ -66,20 +66,21 @@ public class Producer {
 
     int x = random.nextInt(width - frontWidth - widthOffset) + widthOffset;
     int y = random.nextInt(height - frontWidth);
+    String formatName = file.getName().substring(file.getName().lastIndexOf(Constants.DOT) + 1);
     try {
-      return new Captcha().setToken(UUID.randomUUID().toString()).setFront(front(file, x, y))
-          .setBackground(background(file, x, y));
+      return new Captcha().setToken(UUID.randomUUID().toString())
+          .setFront(front(file, x, y, formatName))
+          .setBackground(background(file, x, y, formatName)).setFormatName(formatName);
     } catch (Exception e) {
       throw Exceptions.wrap(e);
     }
   }
 
-  private BufferedImage background(File file, int x, int y) throws Exception {
+  private BufferedImage background(File file, int x, int y, String formatName) throws Exception {
     Rectangle rectangle = new Rectangle(0, 0, width, height);
     try (FileInputStream fis = new FileInputStream(file); ImageInputStream iis = ImageIO
         .createImageInputStream(fis)) {
-      ImageReader reader = ImageIO.getImageReadersBySuffix(
-          file.getName().substring(file.getName().lastIndexOf(Constants.DOT) + 1)).next();
+      ImageReader reader = ImageIO.getImageReadersBySuffix(formatName).next();
       reader.setInput(iis, true);
       ImageReadParam param = reader.getDefaultReadParam();
       param.setSourceRegion(rectangle);
@@ -88,17 +89,21 @@ public class Producer {
       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
       g.setColor(Color.white);
       g.fillRect(x, y, frontWidth, frontWidth);
+      g.fillArc(x + frontWidth / 4, y - frontWidth / 4, frontWidth / 2, frontWidth / 2, 0, 180);
+      g.fillArc(x + 3 * frontWidth / 4, y + frontWidth / 4, frontWidth / 2, frontWidth / 2, -90,
+          180);
+      g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0));
+      g.fillArc(x - frontWidth / 4, y + frontWidth / 4, frontWidth / 2, frontWidth / 2, -90, 180);
       g.dispose();
       return bi;
     }
   }
 
-  private BufferedImage front(File file, int x, int y) throws Exception {
+  private BufferedImage front(File file, int x, int y, String formatName) throws Exception {
     Rectangle rectangle = new Rectangle(x, y, frontWidth, frontWidth);
     try (FileInputStream fis = new FileInputStream(file); ImageInputStream iis = ImageIO
         .createImageInputStream(fis)) {
-      ImageReader reader = ImageIO.getImageReadersBySuffix(
-          file.getName().substring(file.getName().lastIndexOf(Constants.DOT) + 1)).next();
+      ImageReader reader = ImageIO.getImageReadersBySuffix(formatName).next();
       reader.setInput(iis, true);
       ImageReadParam param = reader.getDefaultReadParam();
       param.setSourceRegion(rectangle);
