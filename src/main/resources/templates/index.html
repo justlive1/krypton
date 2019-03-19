@@ -3,11 +3,343 @@
 <head>
   <meta charset="UTF-8">
   <title>krypton</title>
+  <style type="text/css">
+
+    .krypton {
+      -webkit-tap-highlight-color: transparent
+    }
+
+    .krypton *, .krypton_pop * {
+      box-sizing: border-box
+    }
+
+    .krypton.krypton--light {
+      position: relative;
+      margin: auto;
+      font-size: 14px
+    }
+
+    .krypton.krypton--light .krypton_jigsaw, .krypton.krypton--light .krypton_slide_indicator, .krypton.krypton--light .krypton_slider {
+      display: none
+    }
+
+    .krypton.krypton--light.krypton--jigsaw .krypton_jigsaw, .krypton.krypton--light.krypton--jigsaw .krypton_slide_indicator, .krypton.krypton--light.krypton--jigsaw .krypton_slider {
+      display: block
+    }
+
+    .krypton.krypton--light .krypton_jigsaw {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: auto;
+      height: 100%
+    }
+
+    .krypton.krypton--light.krypton--float .krypton_panel {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      z-index: 999
+    }
+
+    .krypton.krypton--light .krypton_panel {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none
+    }
+
+    .krypton.krypton--light .krypton_panel-placeholder {
+      pointer-events: auto;
+      position: relative;
+      padding-top: 50%;
+      overflow: hidden
+    }
+
+    .krypton.krypton--light .krypton_bgimg {
+      pointer-events: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    .krypton.krypton--light .krypton_bgimg .krypton_bg-img {
+      pointer-events: auto;
+      vertical-align: top;
+      width: 100%
+    }
+
+    .krypton.krypton--light .krypton_loadbox {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/tipBg.ad4e919.png");
+      background-color: #f7f9fa;
+      background-position: 50%;
+      background-size: cover
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_loadbox {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/tipBg@2x.c7a9593.png")
+      }
+    }
+
+    .krypton.krypton--light .krypton_loadbox .krypton_loadbox__inner {
+      position: relative;
+      top: 50%;
+      margin-top: -25px
+    }
+
+    .krypton.krypton--light .krypton_loadbox .krypton_loadbox__inner .krypton_loadicon {
+      width: 32px;
+      height: 32px;
+      background-repeat: no-repeat
+    }
+
+    .krypton.krypton--light .krypton_loadbox .krypton_loadbox__inner .krypton_loadtext {
+      display: block;
+      line-height: 20px;
+      color: #45494c
+    }
+
+    .krypton.krypton--light .krypton_refresh {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 -460px;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_refresh {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 -460px;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light .krypton_refresh:hover {
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 -423px;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_refresh:hover {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 -423px;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light.krypton--maxerror .krypton_refresh {
+      cursor: not-allowed
+    }
+
+    .krypton.krypton--light.krypton--maxerror .krypton_refresh:hover {
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 -460px;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light.krypton--maxerror .krypton_refresh:hover {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 -460px;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light .krypton_control {
+      position: relative;
+      border: 1px solid #e4e7eb;
+      background-color: #f7f9fa
+    }
+
+    .krypton.krypton--light .krypton_control.krypton_control--moving .krypton_slide_indicator {
+      border-color: #1991fa;
+      background-color: #d1e9fe
+    }
+
+    .krypton.krypton--light .krypton_control.krypton_control--moving .krypton_slider {
+      background-color: #1991fa
+    }
+
+    .krypton.krypton--light .krypton_control.krypton_control--moving .krypton_slider .krypton_slider__icon {
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 0;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_control.krypton_control--moving .krypton_slider .krypton_slider__icon {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 0;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light .krypton_slide_indicator {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 0;
+      border: 1px solid transparent
+    }
+
+    .krypton.krypton--light .krypton_slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+      cursor: pointer;
+      transition: background .2s linear
+    }
+
+    .krypton.krypton--light .krypton_slider:hover {
+      background-color: #1991fa
+    }
+
+    .krypton.krypton--light .krypton_slider:hover .krypton_slider__icon {
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 0;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_slider:hover .krypton_slider__icon {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 0;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light .krypton_slider .krypton_slider__icon {
+      position: absolute;
+      top: 50%;
+      margin-top: -6px;
+      left: 50%;
+      margin-left: -6px;
+      width: 14px;
+      height: 10px;
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 -13px;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light .krypton_slider .krypton_slider__icon {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 -13px;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light .krypton_slider img.krypton_slider__icon {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      margin: 0;
+      background-image: none !important
+    }
+
+    .krypton.krypton--light .krypton_tips {
+      text-align: center;
+      color: #45494c
+    }
+
+    .krypton.krypton--light.krypton--loadfail .krypton_loadicon {
+      background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light.f0aea65.png");
+      background-position: 0 -175px;
+      background-size: 34px 494px
+    }
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+      .krypton.krypton--light.krypton--loadfail .krypton_loadicon {
+        background-image: url("https://cstaticdun.126.net//2.10.3/images/icon_light@2x.826e2ee.png");
+        background-position: 0 -175px;
+        background-size: 34px 494px
+      }
+    }
+
+    .krypton.krypton--light.krypton--icon_point.krypton--button .krypton_control, .krypton.krypton--light.krypton--point.krypton--button .krypton_control {
+      cursor: pointer;
+      background: #f7f9fa;
+      background: linear-gradient(180deg, #fff 0, #ebedf0 87%)
+    }
+
+    .krypton.krypton--light .krypton_tips__text {
+      vertical-align: middle
+    }
+
+    .krypton.krypton--light.krypton--verifying .krypton_refresh {
+      cursor: not-allowed
+    }
+
+    .m-captcha {
+      font-size: 0;
+      padding: 8px 0;
+    }
+
+    body {
+      background: #f5f7fa;
+    }
+
+    .krypton:hover .krypton_panel {
+      display: block !important;
+    }
+
+  </style>
 </head>
 <body>
 
-<img id="bg"/>
-<img id="ft"/>
+<h1>11</h1>
+
+<div class="m-captcha" style="margin-top: 400px">
+  <div class="krypton krypton--light krypton--float krypton--jigsaw"
+       style="width: 326px; min-width: 220px">
+    <div class="krypton_panel" style="bottom: 40px; padding-bottom: 15px; display: none;">
+      <div class="krypton_panel-placeholder">
+        <div class="krypton_bgimg">
+          <img class="krypton_bg-img" id="bg" style="border-radius: 2px"/>
+          <img class="krypton_jigsaw" id="ft" style="left: 0px;"/>
+        </div>
+        <div class="krypton_loadbox" style="border-radius: 2px">
+          <div class="krypton_loadbox__inner">
+            <div class="krypton_loadicon"></div>
+            <span class="krypton_loadtext">加载中...</span></div>
+        </div>
+        <div class="krypton_refresh" title="刷新"></div>
+      </div>
+    </div>
+    <div class="krypton_control" style="height: 40px; border-radius: 2px">
+      <div class="krypton_slide_indicator"
+           style="height: 40px; border-radius: 2px; width: 0px;"></div>
+      <div class="krypton_slider" style="width: 40px; border-radius: 2px; left: 0px;">
+        <span class="krypton_slider__icon"></span>
+      </div>
+      <div class="krypton_tips" style="line-height: 40px"><span class="krypton_tips__icon"></span>
+        <span
+            class="krypton_tips__text">向右拖动滑块填充拼图</span>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" name="NECaptchaValidate" value="" class="krypton_input"></div>
 
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script>
