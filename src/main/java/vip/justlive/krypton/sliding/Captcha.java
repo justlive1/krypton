@@ -17,4 +17,5 @@ public class Captcha {
   private String formatName;
   private BufferedImage background;
   private BufferedImage front;
+  private int offset;
 }

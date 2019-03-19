@@ -5,8 +5,10 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import vip.justlive.krypton.sliding.Captcha;
 import vip.justlive.krypton.sliding.Producer;
 import vip.justlive.oxygen.core.domain.Resp;
@@ -15,6 +17,7 @@ import vip.justlive.oxygen.core.util.ExpiringMap;
 /**
  * @author wubo
  */
+@CrossOrigin
 @RestController
 @RequestMapping("sliding")
 public class ImageController {
@@ -28,6 +31,11 @@ public class ImageController {
   private ExpiringMap<String, Captcha> cache = ExpiringMap.<String, Captcha>builder()
       .expiration(5, TimeUnit.MINUTES)
       .build();
+
+  @RequestMapping
+  public ModelAndView view() {
+    return new ModelAndView("index.html");
+  }
 
   @RequestMapping("create")
   public Resp image() {
