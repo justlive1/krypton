@@ -1,6 +1,6 @@
 package vip.justlive.krypton.sliding;
 
-import java.awt.image.BufferedImage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,8 +14,10 @@ import lombok.experimental.Accessors;
 public class Captcha {
 
   private String token;
+  private String background;
+  private String jigsaw;
+  @JsonIgnore
   private String formatName;
-  private BufferedImage background;
-  private BufferedImage front;
+  @JsonIgnore
   private int offset;
 }

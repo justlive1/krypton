@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Random;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -23,6 +26,7 @@ public class Producer {
   private static final int DEFAULT_HEIGHT = 240;
   private static final int DEFAULT_WIDTH_OFFSET = 120;
   private static final int DEFAULT_DIAMETER = 60;
+  private static final String TEMPLATE = "data:image/%s;base64,%s";
 
   private final Random random = new Random();
   /**
@@ -68,11 +72,22 @@ public class Producer {
     String formatName = file.getName().substring(file.getName().lastIndexOf(Constants.DOT) + 1);
     try {
       return new Captcha().setToken(UUID.randomUUID().toString()).setFormatName(formatName)
-          .setOffset(x).setFront(front(file, x, y))
-          .setBackground(background(file, x, y));
+          .setOffset(x).setBackground(toBase64(background(file, x, y), formatName))
+          .setJigsaw(toBase64(jigsaw(file, x, y), formatName));
     } catch (Exception e) {
       throw Exceptions.wrap(e);
     }
+  }
+  
+  public boolean validate(Captcha captcha, int offset) {
+    return true;
+  }
+
+  private String toBase64(BufferedImage image, String formatName) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ImageIO.write(image, formatName, out);
+    return String.format(TEMPLATE, formatName,
+        Base64.getEncoder().encodeToString(out.toByteArray()));
   }
 
   private BufferedImage background(File file, int x, int y) throws Exception {
@@ -87,7 +102,7 @@ public class Producer {
     return image;
   }
 
-  private BufferedImage front(File file, int x, int y) throws Exception {
+  private BufferedImage jigsaw(File file, int x, int y) throws Exception {
     BufferedImage bi = ImageIO.read(file);
     BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = image.createGraphics();
@@ -109,7 +124,7 @@ public class Producer {
   private Polygon create(int x, int y) {
     Polygon polygon = new Polygon();
     polygon.addPoint(x, y);
-    //上半圆
+    // 上半圆
     int start = x + diameter / 4;
     int end = x + diameter / 4 * 3;
     int r = diameter / 4;
@@ -127,7 +142,7 @@ public class Producer {
     }
     polygon.addPoint(x + diameter, y + diameter);
     polygon.addPoint(x, y + diameter);
-    //左半圆
+    // 左半圆
     start = y + diameter / 4 * 3;
     end = y + diameter / 4;
     for (int i = start; i >= end; i--) {

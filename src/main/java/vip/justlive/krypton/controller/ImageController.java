@@ -1,9 +1,6 @@
 package vip.justlive.krypton.controller;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +25,8 @@ public class ImageController {
     this.producer = new Producer(path);
   }
 
-  private ExpiringMap<String, Captcha> cache = ExpiringMap.<String, Captcha>builder()
-      .expiration(5, TimeUnit.MINUTES)
-      .build();
+  private ExpiringMap<String, Captcha> cache =
+      ExpiringMap.<String, Captcha>builder().expiration(5, TimeUnit.MINUTES).build();
 
   @RequestMapping
   public ModelAndView view() {
@@ -41,23 +37,7 @@ public class ImageController {
   public Resp image() {
     Captcha captcha = producer.create();
     cache.put(captcha.getToken(), captcha);
-    return Resp.success(captcha.getToken());
-  }
-
-  @RequestMapping("background")
-  public void background(String token, HttpServletResponse response) throws IOException {
-    Captcha captcha = cache.get(token);
-    if (captcha != null) {
-      ImageIO.write(captcha.getBackground(), captcha.getFormatName(), response.getOutputStream());
-    }
-  }
-
-  @RequestMapping("front")
-  public void front(String token, HttpServletResponse response) throws IOException {
-    Captcha captcha = cache.get(token);
-    if (captcha != null) {
-      ImageIO.write(captcha.getFront(), captcha.getFormatName(), response.getOutputStream());
-    }
+    return Resp.success(captcha);
   }
 
 }
