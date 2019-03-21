@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import vip.justlive.krypton.sliding.Captcha;
-import vip.justlive.krypton.sliding.Encrypt;
 import vip.justlive.krypton.sliding.Producer;
+import vip.justlive.krypton.util.Encrypt;
 import vip.justlive.oxygen.core.domain.Resp;
 import vip.justlive.oxygen.core.util.ExpiringMap;
 
@@ -34,11 +34,22 @@ public class SlidingController {
     this.producer = new Producer(path);
   }
 
+  /**
+   * 测试页面
+   * 
+   * @return
+   */
   @RequestMapping
   public ModelAndView view() {
     return new ModelAndView("index.html");
   }
 
+  /**
+   * js
+   * 
+   * @param model
+   * @return
+   */
   @RequestMapping("krypton.js")
   public ModelAndView js(Model model) {
     String token = UUID.randomUUID().toString();
@@ -49,6 +60,12 @@ public class SlidingController {
     return new ModelAndView("krypton.js");
   }
 
+  /**
+   * 生成验证码图片
+   * 
+   * @param token
+   * @return
+   */
   @RequestMapping("create")
   public Resp create(@RequestParam String token) {
     Captcha captcha = producer.create().setKid(token);
@@ -56,6 +73,13 @@ public class SlidingController {
     return Resp.success(captcha);
   }
 
+  /**
+   * 前端校验
+   * 
+   * @param token
+   * @param data
+   * @return
+   */
   @RequestMapping("validate")
   public Resp validate(@RequestParam String token, @RequestParam String data) {
     Captcha captcha = CAPTCHAS.get(token);
@@ -74,6 +98,13 @@ public class SlidingController {
     return Resp.error("failed");
   }
 
+  /**
+   * 后端最终校验
+   * 
+   * @param token
+   * @param validate
+   * @return
+   */
   @RequestMapping("check")
   public Resp check(@RequestParam String token, @RequestParam String validate) {
     Captcha captcha = CAPTCHAS.get(token);
