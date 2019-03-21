@@ -11,6 +11,11 @@
 			+ '<div class="krypton_slider" id="krypton_slider"><span class="krypton_slider_icon"></span></div>'
 			+ '<div class="krypton_tips"><span class="krypton_tips_icon"></span>' + '<span class="krypton_tips_text">向右拖动滑块填充拼图</span></div></div></div>';
 
+	var _token = [[${token}]];
+	var _key = [[${key}]];
+	var _validateVal = {};
+	var _offset = 0, _startTamp = 0, _startX = 0;
+
 	function ajax(url, method, data, callback) {
 		// 低版本浏览器没有考虑
 		var xhr = new XMLHttpRequest();
@@ -32,19 +37,29 @@
 		xhr.send(param);
 	}
 
+	function encrypt(raw) {
+		var value = '';
+		while (raw > 0) {
+			value += _key[raw % 10];
+			raw = ~~(raw / 10);
+		}
+		return value;
+	}
+
 	var Krypton = function(id, conf) {
 		var _conf = conf || {};
 		var _this = this;
-
 		this.url = _conf.url || '/sliding/create';
 		this.validateUrl = _conf.validateUrl || '/sliding/validate';
 
 		this.fetch = _conf.fetch || function() {
 			ajax(this.url, 'post', {
+				token : _token,
 				_t : new Date().getTime()
 			}, function(resp) {
 				krypton_bg.setAttribute("src", resp.data.background);
 				krypton_jigsaw.setAttribute("src", resp.data.jigsaw);
+				_this.token = resp.data.token;
 			});
 		};
 
@@ -65,8 +80,8 @@
 			};
 			krypton_slider.onmousedown = function(e) {
 				e.preventDefault();
-				_this.startX = e.clientX;
-				_this.startTamp = new Date().getTime();
+				_startX = e.clientX;
+				_startTamp = new Date().getTime();
 				var target = e.target;
 				document.addEventListener('mousemove', mousemove);
 				document.addEventListener('mouseup', mouseup);
@@ -76,10 +91,10 @@
 				krypton_panel.style.display = "block";
 
 				function mousemove(event) {
-					_this.x = Math.min(Math.max(0, event.clientX - _this.startX), 286);
-					krypton_slider.style.left = _this.x + "px";
-					krypton_jigsaw.style.left = (_this.x - _this.x / 30) + "px";
-					krypton_slide_indicator.style.width = _this.x + "px";
+					_offset = Math.min(Math.max(0, event.clientX - _startX), 286);
+					krypton_slider.style.left = _offset + "px";
+					krypton_jigsaw.style.left = (_offset - _offset / 30) + "px";
+					krypton_slide_indicator.style.width = _offset + "px";
 					krypton_slider.style.transition = "none";
 					krypton_jigsaw.style.transition = "none";
 				}
@@ -93,19 +108,30 @@
 		};
 
 		this.validate = function() {
-			console.log(_this.x + "|" + (new Date().getTime() - _this.startTamp));
-
-			if (Math.random() > 0.5) {
-				krypton_slide_indicator.style.borderColor = '#f57a7a';
-				krypton_slide_indicator.style.backgroundColor = '#fce1e1';
+			ajax(_this.validateUrl, 'post', {
+				token : this.token,
+				data : encrypt(_offset) + "/" + encrypt(new Date().getTime() - _startTamp)
+			}, function(resp) {
+				if (resp.success) {
+					krypton_slide_indicator.style.borderColor = '#52ccba';
+					krypton_slide_indicator.style.backgroundColor = '#d2f4ef';
+					krypton_panel.style.display = "none";
+					_validateVal.validate = resp.data;
+					_validateVal.token = _this.token;
+				} else {
+					krypton_slide_indicator.style.borderColor = '#f57a7a';
+					krypton_slide_indicator.style.backgroundColor = '#fce1e1';
+					_validateVal = {};
+				}
+				_validateVal.success = resp.success;
 				setTimeout(function() {
 					krypton_refresh.click();
 				}, 500);
-			} else {
-				krypton_slide_indicator.style.borderColor = '#52ccba';
-				krypton_slide_indicator.style.backgroundColor = '#d2f4ef';
-				krypton_panel.style.display = "none";
-			}
+			});
+		};
+
+		this.validateVal = function() {
+			return _validateVal;
 		};
 
 		this.init();

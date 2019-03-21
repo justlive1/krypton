@@ -16,6 +16,9 @@ public class Captcha {
   private String token;
   private String background;
   private String jigsaw;
+  private int validate;
+  @JsonIgnore
+  private String kid;
   @JsonIgnore
   private String formatName;
   @JsonIgnore

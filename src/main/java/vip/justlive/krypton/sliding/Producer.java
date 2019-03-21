@@ -22,10 +22,10 @@ import vip.justlive.oxygen.core.exception.Exceptions;
  */
 public class Producer {
 
-  private static final int DEFAULT_WIDTH = 480;
-  private static final int DEFAULT_HEIGHT = 240;
-  private static final int DEFAULT_WIDTH_OFFSET = 120;
-  private static final int DEFAULT_DIAMETER = 60;
+  private static final int DEFAULT_WIDTH = 320;
+  private static final int DEFAULT_HEIGHT = DEFAULT_WIDTH / 2;
+  private static final int DEFAULT_WIDTH_OFFSET = DEFAULT_WIDTH / 4;
+  private static final int DEFAULT_DIAMETER = DEFAULT_WIDTH / 8;
   private static final String TEMPLATE = "data:image/%s;base64,%s";
 
   private final Random random = new Random();
@@ -71,16 +71,21 @@ public class Producer {
     int y = random.nextInt(height - diameter * 2) + diameter;
     String formatName = file.getName().substring(file.getName().lastIndexOf(Constants.DOT) + 1);
     try {
-      return new Captcha().setToken(UUID.randomUUID().toString()).setFormatName(formatName)
-          .setOffset(x).setBackground(toBase64(background(file, x, y), formatName))
-          .setJigsaw(toBase64(jigsaw(file, x, y), formatName));
+      return new Captcha().setFormatName(formatName).setOffset(x)
+          .setBackground(toBase64(background(file, x, y), formatName))
+          .setJigsaw(toBase64(jigsaw(file, x, y), formatName))
+          .setToken(UUID.randomUUID().toString());
     } catch (Exception e) {
       throw Exceptions.wrap(e);
     }
   }
-  
-  public boolean validate(Captcha captcha, int offset) {
-    return true;
+
+  public boolean validate(Captcha captcha, int offset, int time) {
+    boolean b = Math.abs(captcha.getOffset() - offset) < 10;
+    if (b) {
+      captcha.setValidate(random.nextInt(10000));
+    }
+    return b;
   }
 
   private String toBase64(BufferedImage image, String formatName) throws IOException {
