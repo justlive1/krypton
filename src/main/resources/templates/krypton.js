@@ -1,7 +1,6 @@
 (function() {
 
 	var root = this;
-	var counter = 0;
 	var template = '<div class="krypton krypton_light krypton_float krypton_jigsaw"><div class="krypton_panel" id="krypton_panel">'
 			+ '<div class="krypton_panel-placeholder"><div class="krypton_bgimg">' + '<img class="krypton_bg-img" id="krypton_bg" />'
 			+ '<img class="krypton_jigsaw" id="krypton_jigsaw"/></div>' + '<div class="krypton_loadbox">'
