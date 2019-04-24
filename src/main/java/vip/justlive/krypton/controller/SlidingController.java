@@ -1,73 +1,78 @@
 package vip.justlive.krypton.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 import vip.justlive.krypton.sliding.Captcha;
 import vip.justlive.krypton.sliding.Producer;
 import vip.justlive.krypton.util.Encrypt;
+import vip.justlive.oxygen.core.config.ConfigFactory;
 import vip.justlive.oxygen.core.domain.Resp;
+import vip.justlive.oxygen.core.template.SimpleTemplateEngine;
+import vip.justlive.oxygen.core.template.TemplateEngine;
+import vip.justlive.oxygen.core.template.Templates;
 import vip.justlive.oxygen.core.util.ExpiringMap;
+import vip.justlive.oxygen.web.annotation.Mapping;
+import vip.justlive.oxygen.web.annotation.Param;
+import vip.justlive.oxygen.web.annotation.Router;
+import vip.justlive.oxygen.web.result.Result;
+import vip.justlive.oxygen.web.router.RoutingContext;
 
 /**
  * @author wubo
  */
-@CrossOrigin
-@RestController
-@RequestMapping("sliding")
+@Router("sliding")
 public class SlidingController {
 
   private final Producer producer;
+  private final TemplateEngine engine;
 
-  private ExpiringMap<String, String> KEYS =
-      ExpiringMap.<String, String>builder().expiration(10, TimeUnit.MINUTES).build();
-  private ExpiringMap<String, Captcha> CAPTCHAS =
-      ExpiringMap.<String, Captcha>builder().expiration(5, TimeUnit.MINUTES).build();
+  private ExpiringMap<String, String> KEYS = ExpiringMap.<String, String>builder()
+      .expiration(10, TimeUnit.MINUTES).build();
+  private ExpiringMap<String, Captcha> CAPTCHAS = ExpiringMap.<String, Captcha>builder()
+      .expiration(5, TimeUnit.MINUTES).build();
 
-  public SlidingController(@Value("${sliding.path}") String path) {
-    this.producer = new Producer(path);
+  public SlidingController() {
+    this.producer = new Producer(ConfigFactory.getProperty("sliding.path"));
+    this.engine = new SimpleTemplateEngine();
   }
 
   /**
    * 测试页面
-   * 
+   *
    * @return
    */
-  @RequestMapping
-  public ModelAndView view() {
-    return new ModelAndView("index.html");
+  @Mapping("/")
+  public Result view() {
+    return Result.view("/index.htm");
   }
 
   /**
    * js
-   * 
-   * @param model
+   *
    * @return
    */
-  @RequestMapping("krypton.js")
-  public ModelAndView js(Model model) {
+  @Mapping("krypton.js")
+  public void js(RoutingContext ctx) {
     String token = UUID.randomUUID().toString();
     String key = Encrypt.generateKey(token);
-    model.addAttribute("token", token);
-    model.addAttribute("key", key);
+    Map<String, Object> map = new HashMap<>(4, 1);
+    map.put("token", token);
+    map.put("key", key);
     KEYS.put(token, key);
-    return new ModelAndView("krypton.js");
+    ctx.response().setContentType("application/javascript");
+    ctx.response().write(engine.render(Templates.cachedTemplate("/templates/krypton.js"), map));
   }
 
   /**
    * 生成验证码图片
-   * 
+   *
    * @param token
    * @return
    */
-  @RequestMapping("create")
-  public Resp create(@RequestParam String token) {
+  @Mapping("create")
+  public Resp create(@Param("token") String token) {
     Captcha captcha = producer.create().setKid(token);
     CAPTCHAS.put(captcha.getToken(), captcha);
     return Resp.success(captcha);
@@ -75,13 +80,13 @@ public class SlidingController {
 
   /**
    * 前端校验
-   * 
+   *
    * @param token
    * @param data
    * @return
    */
-  @RequestMapping("validate")
-  public Resp validate(@RequestParam String token, @RequestParam String data) {
+  @Mapping("validate")
+  public Resp validate(@Param("token") String token, @Param("data") String data) {
     Captcha captcha = CAPTCHAS.get(token);
     if (captcha == null) {
       return Resp.error("failed");
@@ -91,8 +96,8 @@ public class SlidingController {
       return Resp.error("failed");
     }
     String[] arr = data.split("/");
-    if (arr.length == 2
-        && producer.validate(captcha, Encrypt.decode(key, arr[0]), Encrypt.decode(key, arr[1]))) {
+    if (arr.length == 2 && producer
+        .validate(captcha, Encrypt.decode(key, arr[0]), Encrypt.decode(key, arr[1]))) {
       return Resp.success(Encrypt.encode(key, captcha.getValidate()));
     }
     return Resp.error("failed");
@@ -100,14 +105,14 @@ public class SlidingController {
 
   /**
    * 后端最终校验
-   * 
+   *
    * @param token
    * @param validate
    * @return
    */
-  @RequestMapping("check")
-  public Resp check(@RequestParam String token, @RequestParam String validate) {
-    Captcha captcha = CAPTCHAS.get(token);
+  @Mapping("check")
+  public Resp check(@Param("token") String token, @Param("validate") String validate) {
+    Captcha captcha = CAPTCHAS.remove(token);
     if (captcha == null) {
       return Resp.error("failed");
     }
@@ -120,4 +125,5 @@ public class SlidingController {
     }
     return Resp.success();
   }
+
 }

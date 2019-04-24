@@ -1,6 +1,6 @@
 package vip.justlive.krypton.sliding;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,10 +17,10 @@ public class Captcha {
   private String background;
   private String jigsaw;
   private int validate;
-  @JsonIgnore
+  @JSONField(serialize = false)
   private String kid;
-  @JsonIgnore
+  @JSONField(serialize = false)
   private String formatName;
-  @JsonIgnore
+  @JSONField(serialize = false)
   private int offset;
 }
